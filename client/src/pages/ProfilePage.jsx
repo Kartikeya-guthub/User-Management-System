@@ -11,13 +11,19 @@ const ProfilePage = () => {
   const [password, setPassword] = useState('');
   const [confirm,  setConfirm]  = useState('');
   const [saving,   setSaving]   = useState(false);
+  const [touched,  setTouched]  = useState({});
+
+  // Inline validation
+  const nameError    = touched.name    && !name.trim()          ? 'Name is required.' : null;
+  const confirmError = touched.confirm && password && confirm !== password ? 'Passwords do not match.' : null;
+  const hasErrors    = !!nameError || !!confirmError;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password && password !== confirm) {
-      addToast('Passwords do not match', 'error');
-      return;
-    }
+    // Mark all fields touched to surface any hidden inline errors
+    setTouched({ name: true, confirm: true });
+    if (!name.trim()) return;
+    if (password && password !== confirm) return;
     setSaving(true);
     try {
       const payload = { name };
@@ -50,7 +56,13 @@ const ProfilePage = () => {
 
         <div style={{ marginBottom: 16 }}>
           <label style={labelStyle}>Name</label>
-          <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} required />
+          <input
+            style={{ ...inputStyle, borderColor: nameError ? '#e53e3e' : '#cbd5e0' }}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, name: true }))}
+          />
+          {nameError && <p style={{ margin: '4px 0 0', color: '#e53e3e', fontSize: 13 }}>{nameError}</p>}
         </div>
 
         <div style={{ marginBottom: 16 }}>
@@ -60,13 +72,20 @@ const ProfilePage = () => {
 
         <div style={{ marginBottom: 20 }}>
           <label style={labelStyle}>Confirm New Password</label>
-          <input style={inputStyle} type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+          <input
+            style={{ ...inputStyle, borderColor: confirmError ? '#e53e3e' : '#cbd5e0' }}
+            type="password"
+            value={confirm}
+            onChange={(e) => { setConfirm(e.target.value); setTouched((t) => ({ ...t, confirm: true })); }}
+            onBlur={() => setTouched((t) => ({ ...t, confirm: true }))}
+          />
+          {confirmError && <p style={{ margin: '4px 0 0', color: '#e53e3e', fontSize: 13 }}>{confirmError}</p>}
         </div>
 
         {/* Role and status intentionally NOT shown — user cannot change them */}
 
-        <button type="submit" disabled={saving}
-          style={{ width: '100%', padding: '10px', background: saving ? '#a0aec0' : '#3182ce', color: '#fff', border: 'none', borderRadius: 6, cursor: saving ? 'not-allowed' : 'pointer' }}>
+        <button type="submit" disabled={saving || hasErrors}
+          style={{ width: '100%', padding: '10px', background: (saving || hasErrors) ? '#a0aec0' : '#3182ce', color: '#fff', border: 'none', borderRadius: 6, cursor: (saving || hasErrors) ? 'not-allowed' : 'pointer' }}>
           {saving ? 'Saving...' : 'Update Profile'}
         </button>
       </form>

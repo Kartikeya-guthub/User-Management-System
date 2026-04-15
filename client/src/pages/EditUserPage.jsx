@@ -14,6 +14,12 @@ const EditUserPage = () => {
   const [target,  setTarget]  = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving,  setSaving]  = useState(false);
+  const [touched, setTouched] = useState({});
+
+  // Inline validation
+  const nameError  = touched.name  && !form.name.trim()                              ? 'Name is required.'           : null;
+  const emailError = touched.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) ? 'Enter a valid email address.' : null;
+  const hasErrors  = !!nameError || !!emailError;
 
   useEffect(() => {
     const fetch = async () => {
@@ -34,6 +40,9 @@ const EditUserPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setTouched({ name: true, email: true });
+    if (!form.name.trim()) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return;
     setSaving(true);
     try {
       await api.put(`/users/${id}`, form);
@@ -66,14 +75,27 @@ const EditUserPage = () => {
 
         <div style={{ marginBottom: 16 }}>
           <label style={labelStyle}>Name</label>
-          <input style={inputStyle} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          <input
+            style={{ ...inputStyle, borderColor: nameError ? '#e53e3e' : '#cbd5e0' }}
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            onBlur={() => setTouched((t) => ({ ...t, name: true }))}
+          />
+          {nameError && <p style={{ margin: '4px 0 0', color: '#e53e3e', fontSize: 13 }}>{nameError}</p>}
         </div>
 
         {/* Email — editable by admin and manager */}
         {(isAdmin || isManager) && (
           <div style={{ marginBottom: 16 }}>
             <label style={labelStyle}>Email</label>
-            <input style={inputStyle} type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+            <input
+              style={{ ...inputStyle, borderColor: emailError ? '#e53e3e' : '#cbd5e0' }}
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+            />
+            {emailError && <p style={{ margin: '4px 0 0', color: '#e53e3e', fontSize: 13 }}>{emailError}</p>}
           </div>
         )}
 
@@ -101,8 +123,8 @@ const EditUserPage = () => {
         )}
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button type="submit" disabled={saving}
-            style={{ flex: 1, padding: '10px', background: saving ? '#a0aec0' : '#3182ce', color: '#fff', border: 'none', borderRadius: 6, cursor: saving ? 'not-allowed' : 'pointer' }}>
+          <button type="submit" disabled={saving || hasErrors}
+            style={{ flex: 1, padding: '10px', background: (saving || hasErrors) ? '#a0aec0' : '#3182ce', color: '#fff', border: 'none', borderRadius: 6, cursor: (saving || hasErrors) ? 'not-allowed' : 'pointer' }}>
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
           <button type="button" onClick={() => navigate(`/users/${id}`)}
