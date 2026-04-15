@@ -31,3 +31,9 @@ logs/
 
 # Phase explanation docs — local study only, not for GitHub
 PHASE_*.md
+
+# Client env
+client/.env
+
+# Client build output
+client/dist/
