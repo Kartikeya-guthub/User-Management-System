@@ -8,6 +8,9 @@ const { ROLES } = require('../config/roles');
 // ── Helper: generate random password ─────────────────────────────
 const generatePassword = () => Math.random().toString(36).slice(-8) + 'A1!';
 
+// ── Helper: escape special regex characters to prevent ReDoS ─────
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // ── @desc   Create a new user (Admin only)
 // ── @route  POST /api/users
 // ── @access Admin
@@ -46,9 +49,10 @@ const createUser = async (req, res) => {
 // ── @access Admin, Manager
 const getUsers = async (req, res) => {
   try {
-    const page   = parseInt(req.query.page)  || 1;
-    const limit  = parseInt(req.query.limit) || 10;
-    const skip   = (page - 1) * limit;
+    // Sanitize and clamp pagination — prevent negative skip / crash
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
+    const skip  = (page - 1) * limit;
 
     // Build filter object cleanly
     const filter = {};
@@ -56,9 +60,10 @@ const getUsers = async (req, res) => {
     if (req.query.role)   filter.role   = req.query.role;
     if (req.query.status) filter.status = req.query.status;
 
-    // Partial search on name OR email
+    // Partial search on name OR email — escape input to prevent ReDoS
     if (req.query.search) {
-      const regex = new RegExp(req.query.search, 'i');
+      const safe  = escapeRegex(req.query.search);
+      const regex = new RegExp(safe, 'i');
       filter.$or = [{ name: regex }, { email: regex }];
     }
 
@@ -129,9 +134,15 @@ const updateUser = async (req, res) => {
       // Admin can change any field
       const { name, email, role, status } = req.body;
       if (name)   updates.name   = name;
-      if (email)  updates.email  = email;
       if (role)   updates.role   = role;
       if (status) updates.status = status;
+
+      // Email update: check uniqueness to prevent collision
+      if (email && email !== target.email) {
+        const taken = await User.findOne({ email, _id: { $ne: target._id } });
+        if (taken) return res.status(400).json({ success: false, message: 'Email already in use' });
+        updates.email = email;
+      }
 
     } else if (requester.role === ROLES.MANAGER) {
       // Manager cannot touch admins
@@ -144,9 +155,15 @@ const updateUser = async (req, res) => {
       }
       const { name, email, role, status } = req.body;
       if (name)   updates.name   = name;
-      if (email)  updates.email  = email;
       if (role)   updates.role   = role;
       if (status) updates.status = status;
+
+      // Email update: check uniqueness to prevent collision
+      if (email && email !== target.email) {
+        const taken = await User.findOne({ email, _id: { $ne: target._id } });
+        if (taken) return res.status(400).json({ success: false, message: 'Email already in use' });
+        updates.email = email;
+      }
 
     } else {
       // Regular user can only edit own profile (name + password only)
@@ -177,6 +194,11 @@ const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    // Prevent admin from deactivating themselves
+    if (user._id.toString() === req.user._id.toString()) {
+      return res.status(400).json({ success: false, message: 'You cannot deactivate your own account' });
+    }
 
     // Soft delete: set inactive, do NOT remove from DB
     user.status    = 'inactive';
