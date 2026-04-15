@@ -19,5 +19,20 @@ app.get('/', (req, res) => {
   res.json({ status: 'API is running' });
 });
 
+// ── Routes ─────────────────────────────────────────────
+app.use('/api/auth', require('./routes/auth.routes'));
+
+// ── Global Error Handler ───────────────────────────────
+app.use((err, req, res, next) => {
+  console.error('[Error Handler]:', err);
+
+  const statusCode = err.statusCode || 500;
+  // Send clean error format without exposing deep stack trace internally unless in dev
+  res.status(statusCode).json({
+    success: false,
+    message: err.message || 'Internal Server Error'
+  });
+});
+
 // ── App Export ─────────────────────────────────────────
 module.exports = app;
