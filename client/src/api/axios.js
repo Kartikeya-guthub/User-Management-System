@@ -35,7 +35,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const requestUrl = error.config?.url || '';
+
+    if (error.response && error.response.status === 401 && !requestUrl.includes('/auth/login')) {
       // Clear session and redirect to login
       localStorage.removeItem('token');
       localStorage.removeItem('user');

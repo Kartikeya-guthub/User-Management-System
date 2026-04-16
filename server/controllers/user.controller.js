@@ -138,10 +138,8 @@ const getUserById = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Not authorized to view this user' });
     }
 
-    // Manager cannot view admin users
-    if (requester.role === ROLES.MANAGER && user.role === ROLES.ADMIN) {
-      return res.status(403).json({ success: false, message: 'Not authorized to view admin users' });
-    }
+    // Manager can view all users (including admins) but cannot modify them
+    // Permission checks for modifications are handled in updateUser
 
     res.json({ success: true, data: user });
   } catch (err) {
@@ -162,10 +160,11 @@ const updateUser = async (req, res) => {
 
     if (requester.role === ROLES.ADMIN) {
       // Admin can change any field
-      const { name, email, username, role, status } = req.body;
+      const { name, email, username, role, status, password } = req.body;
       if (name)   updates.name   = name;
       if (role)   updates.role   = role;
       if (status) updates.status = status;
+      if (password) updates.password = password;
 
       if (username) {
         const normalized = normalizeUsername(username);
@@ -217,6 +216,11 @@ const updateUser = async (req, res) => {
       // Regular user can only edit own profile (name + password only)
       if (requester._id.toString() !== target._id.toString()) {
         return res.status(403).json({ success: false, message: 'Not authorized to edit this user' });
+      }
+      const forbiddenFields = ['email', 'username', 'role', 'status', 'createdBy', 'updatedBy'];
+      const hasForbiddenField = forbiddenFields.some((field) => req.body[field] !== undefined);
+      if (hasForbiddenField) {
+        return res.status(403).json({ success: false, message: 'Not authorized to change this field' });
       }
       if (req.body.name)     updates.name     = req.body.name;
       if (req.body.password) updates.password = req.body.password;

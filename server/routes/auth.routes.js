@@ -8,9 +8,41 @@ const { login } = require('../controllers/auth.controller');
 const { verifyToken, authorizeRoles } = require('../middleware/auth.middleware');
 const { ROLES } = require('../config/roles');
 
-// ── @route  POST /api/auth/login
-// ── @desc   Login user
-// ── @access Public
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login with email or username
+ *     description: Authenticate a user and return JWT token. Inactive users are blocked.
+ *     tags:
+ *       - Auth
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginRequest'
+ *     responses:
+ *       200:
+ *         description: Login successful, JWT returned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LoginResponse'
+ *       400:
+ *         description: Validation error (missing fields)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationErrorResponse'
+ *       401:
+ *         description: Invalid credentials or account inactive
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.post(
   '/login',
   [

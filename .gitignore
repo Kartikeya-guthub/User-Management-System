@@ -32,6 +32,11 @@ logs/
 # Phase explanation docs — local study only, not for GitHub
 PHASE_*.md
 
+# Documentation files — local reference only, keep only README.md
+TESTING.md
+SWAGGER_DOCS.md
+SWAGGER_QUICK_START.md
+
 # Client env
 client/.env
 

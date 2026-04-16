@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const LoginPage = () => {
   const { login } = useAuth();
+  const { addToast } = useToast();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
@@ -15,22 +17,19 @@ const LoginPage = () => {
     try {
       await login(identifier, password);
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      const message = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || err.message || 'Login failed';
+      setError(message);
+      addToast(message, 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-layout">
-      <section className="auth-hero surface">
-        <span className="eyebrow">User Management System</span>
-        <h1>Sign in to continue.</h1>
-        <p>Access your account.</p>
-      </section>
-
-      <section className="auth-card surface">
+    <div className="auth-layout auth-layout--single">
+      <section className="auth-card auth-card--login surface">
         <div className="auth-card__header">
+          <span className="eyebrow">User Management System</span>
           <h2>Welcome back</h2>
           <p>Enter your details to log in.</p>
         </div>
@@ -41,6 +40,7 @@ const LoginPage = () => {
           <label className="field">
             <span>Email or username</span>
             <input
+              className="input"
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
@@ -53,6 +53,7 @@ const LoginPage = () => {
           <label className="field">
             <span>Password</span>
             <input
+              className="input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
