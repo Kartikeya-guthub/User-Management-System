@@ -21,11 +21,11 @@ Full-stack User Management System using Node.js (Express), MongoDB, and React.
 ## Client Setup
 1. Run `npm install` inside the `client/` directory.
 2. Start the frontend with `npm start` or `npm run dev`.
-3. If you deploy the backend elsewhere, update `client/.env` with `VITE_API_URL`.
+3. If you deploy the backend elsewhere, update `client/.env` with `VITE_API_URL` set to the backend base URL without `/api`.
 
 ## Deployment Notes
 - Backend: deploy the `server/` app with `PORT`, `MONGO_URI`, `JWT_SECRET`, and `JWT_EXPIRES_IN` configured.
-- Frontend: deploy the `client/` app and point `VITE_API_URL` to the deployed backend base URL.
+- Frontend: deploy the `client/` app and point `VITE_API_URL` to the deployed backend base URL without `/api`.
 - Use the seeded admin account below to demonstrate the full RBAC flow in your demo video.
 
 ## Default Access
