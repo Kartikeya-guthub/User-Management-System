@@ -19,7 +19,7 @@
   left: -3rem;
   width: 18rem;
   height: 18rem;
-  background: rgba(45, 212, 191, 0.18);
+  background: rgba(45, 212, 191, 0.12);
 }
 
 .app-shell__glow--b {
@@ -27,7 +27,7 @@
   right: -3rem;
   width: 20rem;
   height: 20rem;
-  background: rgba(245, 158, 11, 0.16);
+  background: rgba(245, 158, 11, 0.12);
 }
 
 .app-shell__glow--c {
@@ -35,7 +35,7 @@
   left: 30%;
   width: 24rem;
   height: 24rem;
-  background: rgba(59, 130, 246, 0.12);
+  background: rgba(59, 130, 246, 0.08);
 }
 
 .app-shell__main {
@@ -132,33 +132,33 @@
 }
 
 .badge--neutral {
-  color: #dbeafe;
-  background: rgba(148, 163, 184, 0.12);
-  border-color: rgba(148, 163, 184, 0.16);
+  color: #334155;
+  background: rgba(148, 163, 184, 0.14);
+  border-color: rgba(148, 163, 184, 0.22);
 }
 
 .badge--info {
-  color: #cffafe;
+  color: #0f766e;
   background: rgba(45, 212, 191, 0.14);
-  border-color: rgba(45, 212, 191, 0.2);
+  border-color: rgba(45, 212, 191, 0.22);
 }
 
 .badge--success {
-  color: #dcfce7;
+  color: #166534;
   background: rgba(34, 197, 94, 0.14);
-  border-color: rgba(34, 197, 94, 0.18);
+  border-color: rgba(34, 197, 94, 0.22);
 }
 
 .badge--warning {
-  color: #ffedd5;
+  color: #9a3412;
   background: rgba(245, 158, 11, 0.16);
-  border-color: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.24);
 }
 
 .badge--danger {
-  color: #ffe4e6;
+  color: #be123c;
   background: rgba(251, 113, 133, 0.15);
-  border-color: rgba(251, 113, 133, 0.2);
+  border-color: rgba(251, 113, 133, 0.22);
 }
 
 .badge--role {
@@ -167,20 +167,20 @@
 
 .badge--role-admin {
   background: rgba(245, 158, 11, 0.16);
-  color: #ffedd5;
-  border-color: rgba(245, 158, 11, 0.22);
+  color: #9a3412;
+  border-color: rgba(245, 158, 11, 0.24);
 }
 
 .badge--role-manager {
   background: rgba(45, 212, 191, 0.14);
-  color: #cffafe;
-  border-color: rgba(45, 212, 191, 0.2);
+  color: #0f766e;
+  border-color: rgba(45, 212, 191, 0.22);
 }
 
 .badge--role-user {
   background: rgba(59, 130, 246, 0.14);
-  color: #dbeafe;
-  border-color: rgba(59, 130, 246, 0.2);
+  color: #1d4ed8;
+  border-color: rgba(59, 130, 246, 0.22);
 }
 
 .btn {
@@ -363,7 +363,7 @@
   padding: 0.9rem 1rem;
   border-radius: 16px;
   border: 1px solid rgba(148, 163, 184, 0.16);
-  background: rgba(15, 23, 42, 0.72);
+  background: rgba(255, 255, 255, 0.96);
   color: var(--text-primary);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -405,7 +405,7 @@
 
 .table thead th {
   text-align: left;
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(241, 245, 249, 0.95);
   color: var(--text-title);
 }
 
@@ -416,7 +416,7 @@
 }
 
 .table tbody tr:hover {
-  background: rgba(148, 163, 184, 0.04);
+  background: rgba(148, 163, 184, 0.08);
 }
 
 .table td:last-child {
@@ -502,7 +502,7 @@
 .action-card,
 .detail-card,
 .feature-item {
-  background: rgba(15, 23, 42, 0.72);
+  background: rgba(255, 255, 255, 0.94);
   border: 1px solid rgba(148, 163, 184, 0.14);
   border-radius: 22px;
 }
@@ -512,7 +512,7 @@
 }
 
 .stat-card--accent {
-  background: linear-gradient(135deg, rgba(45, 212, 191, 0.16), rgba(15, 23, 42, 0.72));
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.16), rgba(255, 255, 255, 0.94));
 }
 
 .stat-label,
@@ -571,7 +571,7 @@
 }
 
 .action-card__link {
-  color: #f8b84e;
+  color: #b45309;
   font-weight: 700;
 }
 
@@ -745,7 +745,7 @@
   height: 4rem;
   border-radius: 22px;
   background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(245, 158, 11, 0.22));
-  color: #f8fafc;
+  color: #0f172a;
   font-weight: 900;
   font-size: 1.3rem;
 }
@@ -757,7 +757,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(2, 6, 23, 0.72);
+  background: rgba(15, 23, 42, 0.16);
   backdrop-filter: blur(6px);
 }
 
