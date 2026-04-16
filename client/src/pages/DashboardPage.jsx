@@ -41,9 +41,6 @@ const DashboardPage = () => {
       <section className="section-grid">
         {(isAdmin || isManager) && (
           <article className="action-card surface" onClick={() => navigate('/users')}>
-            <div className="action-card__badge">
-              <span className="badge badge--primary">Admin & Manager</span>
-            </div>
             <div className="action-card__icon">Users</div>
             <h2>Manage accounts</h2>
             <p>Search, filter, update, and review all user records from one place.</p>
@@ -53,9 +50,6 @@ const DashboardPage = () => {
 
         {isAdmin && (
           <article className="action-card surface" onClick={() => navigate('/users/create')}>
-            <div className="action-card__badge">
-              <span className="badge badge--warning">Admin only</span>
-            </div>
             <div className="action-card__icon">Add</div>
             <h2>Create user</h2>
             <p>Provision new accounts with a role, status, and optional password.</p>
@@ -64,9 +58,6 @@ const DashboardPage = () => {
         )}
 
         <article className="action-card surface" onClick={() => navigate('/profile')}>
-          <div className="action-card__badge">
-            <span className="badge badge--success">All roles</span>
-          </div>
           <div className="action-card__icon">Profile</div>
           <h2>My profile</h2>
           <p>Update your display name and change your password securely.</p>
