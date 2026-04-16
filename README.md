@@ -2,9 +2,9 @@
 
 > A full-stack MERN application demonstrating JWT authentication, role-based access control (RBAC), and RESTful API design with comprehensive documentation.
 
-**Deployed App:** https://user-management-system-do8b.onrender.com  
+**Deployed App:** https://user-management-system-self-seven.vercel.app
 **API Docs:** https://user-management-system-do8b.onrender.com/api-docs  
-**Source Code:** https://github.com/Kartikeya-guthub/User-Management-System
+
 
 ---
 
@@ -71,7 +71,6 @@
 
 📺 **Full Application Walkthrough:** [Watch Demo Video](#demo)
 
-> 📍 **Note:** Add your Google Drive or YouTube demo video link here. Should showcase:
 > - Login flow with different roles
 > - RBAC enforcement (manager viewing but not modifying admin)
 > - User management interface
@@ -285,47 +284,6 @@ Frontend:
   7 tests, 1.6s, 0 failures ✅
 ```
 
----
-
-## 🌐 Deployment
-
-### Deploy on Render
-
-**Step 1: Push to GitHub**
-```bash
-git add .
-git commit -m "Ready for deployment"
-git push origin main
-```
-
-**Step 2: Connect to Render**
-1. Go to https://dashboard.render.com
-2. Click "New +" → "Web Service"
-3. Connect GitHub repo
-4. Configure:
-   - **Build Command:** `npm install` (or `cd server && npm install`)
-   - **Start Command:** `npm start` (or `cd server && npm start`)
-   - **Environment Variables:**
-     - `PORT=5000`
-     - `NODE_ENV=production`
-     - `MONGO_URI=<your-mongodb-atlas-uri>`
-     - `JWT_SECRET=<strong-secret>`
-     - `JWT_EXPIRES_IN=7d`
-
-**Step 3: Deploy Frontend**
-1. Go to Render Dashboard
-2. New Static Site → Connect GitHub repo (`client/`)
-3. Build Command: `npm install && npm run build`
-4. Publish Directory: `dist`
-5. Set Environment Variable: `VITE_API_URL=https://your-backend.onrender.com`
-
-**Step 4: Test Production**
-- Web App: https://your-frontend.onrender.com
-- API: https://your-backend.onrender.com/api
-- API Docs: https://your-backend.onrender.com/api-docs
-
----
-
 ## 📁 Project Structure
 
 ```
@@ -510,23 +468,7 @@ VITE_API_URL=http://localhost:5000          # Backend URL (without /api)
 
 ---
 
-## 🚨 Troubleshooting
 
-### Port Already in Use
-
-```bash
-# Kill process on port 5000 (macOS/Linux)
-lsof -ti:5000 | xargs kill -9
-
-# Windows PowerShell
-Get-Process -Name node | Stop-Process -Force
-```
-
-### MongoDB Connection Error
-
-- Verify `MONGO_URI` in `.env`
-- Check IP whitelist in MongoDB Atlas
-- Ensure credentials are URL-encoded (replace @ with %40, etc.)
 
 ### Tests Failing
 
@@ -557,56 +499,6 @@ npm test -- --verbose
 
 ---
 
-## 🤝 Support & Contributing
-
-### Report a Bug
-1. Check existing issues
-2. Create detailed bug report with steps to reproduce
-3. Include error messages and screenshots
-
-### Feature Requests
-1. Describe use case
-2. Suggest implementation approach
-3. Label as enhancement
-
-### Pull Requests
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open Pull Request
-
----
-
-## 📄 License
-
-This project is open source and available under the **ISC** License.
-
----
-
-## � Screenshots
-
-### Login Page
-- Clean, centered form with email/username input
-- Real-time validation and error messages
-- Persistent session with localStorage
-
-### Admin Dashboard
-- User management table with search/filter
-- Action buttons: View, Edit, Deactivate
-- Pagination (10-100 users per page)
-- User creation wizard
-
-### User Management
-- Complete CRUD interface
-- Role assignment controls
-- Status indicators (active/inactive)
-- Audit trail display (created/updated by)
-
-*Screenshots coming soon in production demo*
-
----
-
 ## 🏗️ System Architecture
 
 ```
@@ -633,20 +525,3 @@ Auth Flow:
 ```
 
 ---
-
-## �👤 Author
-
-Created as a full-stack demonstration project with production-ready features.
-
-**Last Updated:** April 16, 2026  
-**Version:** 1.0.0
-
----
-
-<div align="center">
-
-**[⬆ Back to Top](#-user-management-system)**
-
-Made with ❤️ using Node.js, MongoDB, and React
-
-</div>

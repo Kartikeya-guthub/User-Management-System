@@ -1,14 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
 const LoginPage = () => {
   const { login } = useAuth();
   const { addToast } = useToast();
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
+  const [identifier, setIdentifier] = useState('admin@system.com');
+  const [password, setPassword] = useState('Admin@123');
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
+
+  // Auto-fill admin credentials on page load
+  useEffect(() => {
+    setIdentifier('admin@system.com');
+    setPassword('Admin@123');
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
