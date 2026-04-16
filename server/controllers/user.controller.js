@@ -85,7 +85,9 @@ const getUsers = async (req, res) => {
     const skip  = (page - 1) * limit;
 
     // Build filter object cleanly
-    const filter = {};
+    const filter = {
+      _id: { $ne: req.user._id } // Exclude logged-in user from list
+    };
 
     if (req.query.role)   filter.role   = req.query.role;
     if (req.query.status) filter.status = req.query.status;
