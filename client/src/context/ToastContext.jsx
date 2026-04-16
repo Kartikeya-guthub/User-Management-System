@@ -14,20 +14,11 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={{ addToast }}>
       {children}
-      <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999 }}>
+      <div className="toast-stack">
         {toasts.map((t) => (
           <div
             key={t.id}
-            style={{
-              marginTop: 8,
-              padding: '12px 20px',
-              borderRadius: 6,
-              color: '#fff',
-              fontWeight: 500,
-              background: t.type === 'error' ? '#e53e3e' : t.type === 'warning' ? '#d69e2e' : '#38a169',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-              minWidth: 220,
-            }}
+            className={`toast toast--${t.type === 'error' ? 'error' : t.type === 'warning' ? 'warning' : 'success'}`}
           >
             {t.message}
           </div>

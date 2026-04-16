@@ -27,49 +27,66 @@ const UserDetailPage = () => {
     fetch();
   }, [id]);
 
-  if (loading) return <div style={{ padding: 32 }}>Loading...</div>;
+  const formatPerson = (value) => {
+    if (!value) return 'System';
+    if (typeof value === 'string') return value;
+    return `${value.name || 'Unknown'}${value.email ? ` (${value.email})` : ''}`;
+  };
+
+  if (loading) return <div className="surface empty-state">Loading...</div>;
   if (!user)   return null;
 
-  const row = (label, value) => (
-    <tr key={label}>
-      <td style={{ padding: '10px 16px', fontWeight: 600, color: '#4a5568', width: 160 }}>{label}</td>
-      <td style={{ padding: '10px 16px', color: '#2d3748' }}>{value || '—'}</td>
-    </tr>
-  );
-
   return (
-    <div style={{ padding: 32, maxWidth: 700 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2 style={{ margin: 0 }}>User Detail</h2>
-        <div style={{ display: 'flex', gap: 10 }}>
-          {/* Edit button — hide for manager viewing admin */}
+    <div className="page page--narrow">
+      <section className="surface page-header page-header--stacked">
+        <div className="detail-head">
+          <div className="avatar">{user.name?.charAt(0)?.toUpperCase() || 'U'}</div>
+          <div>
+            <span className="eyebrow">User detail</span>
+            <h1>{user.name}</h1>
+            <p>{user.email}</p>
+          </div>
+        </div>
+
+        <div className="page-actions">
           {!(currentUser?.role === 'manager' && user.role === 'admin') && (
-            <button onClick={() => navigate(`/users/${id}/edit`)}
-              style={{ padding: '7px 16px', background: '#d69e2e', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer' }}>
+            <button onClick={() => navigate(`/users/${id}/edit`)} className="btn btn--warning">
               Edit
             </button>
           )}
-          <button onClick={() => navigate('/users')}
-            style={{ padding: '7px 16px', background: '#718096', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer' }}>
+          <button onClick={() => navigate('/users')} className="btn btn--secondary">
             Back
           </button>
         </div>
-      </div>
+      </section>
 
-      <div style={{ background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <tbody>
-            {row('Name',       user.name)}
-            {row('Email',      user.email)}
-            {row('Role',       user.role)}
-            {row('Status',     <span style={{ color: user.status === 'active' ? '#38a169' : '#e53e3e', fontWeight: 600 }}>{user.status}</span>)}
-            {row('Created At', new Date(user.createdAt).toLocaleString())}
-            {row('Updated At', new Date(user.updatedAt).toLocaleString())}
-            {row('Created By', user.createdBy ? `${user.createdBy.name} (${user.createdBy.email})` : 'System')}
-            {row('Updated By', user.updatedBy ? `${user.updatedBy.name} (${user.updatedBy.email})` : '—')}
-          </tbody>
-        </table>
-      </div>
+      <section className="detail-grid">
+        <article className="surface detail-card">
+          <div className="detail-card__header">
+            <h2>Account</h2>
+            <span className={`badge badge--role badge--role-${user.role}`}>{user.role}</span>
+          </div>
+          <dl className="detail-list">
+            <div><dt>Name</dt><dd>{user.name}</dd></div>
+            <div><dt>Username</dt><dd>{user.username || '—'}</dd></div>
+            <div><dt>Email</dt><dd>{user.email}</dd></div>
+            <div><dt>Status</dt><dd><span className={`badge ${user.status === 'active' ? 'badge--success' : 'badge--warning'}`}>{user.status}</span></dd></div>
+          </dl>
+        </article>
+
+        <article className="surface detail-card">
+          <div className="detail-card__header">
+            <h2>Audit trail</h2>
+            <span className="badge badge--info">Tracked</span>
+          </div>
+          <dl className="detail-list">
+            <div><dt>Created at</dt><dd>{new Date(user.createdAt).toLocaleString()}</dd></div>
+            <div><dt>Updated at</dt><dd>{new Date(user.updatedAt).toLocaleString()}</dd></div>
+            <div><dt>Created by</dt><dd>{formatPerson(user.createdBy)}</dd></div>
+            <div><dt>Updated by</dt><dd>{formatPerson(user.updatedBy)}</dd></div>
+          </dl>
+        </article>
+      </section>
     </div>
   );
 };

@@ -21,6 +21,15 @@ const userSchema = new mongoose.Schema(
       trim: true,
       match: [/\S+@\S+\.\S+/, 'Please provide a valid email address'],
     },
+    username: {
+      type: String,
+      unique: true,
+      sparse: true,
+      lowercase: true,
+      trim: true,
+      maxlength: [30, 'Username cannot exceed 30 characters'],
+      match: [/^[a-z0-9._-]+$/, 'Username may only contain lowercase letters, numbers, dots, underscores, and hyphens'],
+    },
     // Auth
     password: {
       type: String,

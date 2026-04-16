@@ -18,8 +18,8 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
 
   // ── login(): call API, store token + user ───────────────────────
-  const login = async (email, password) => {
-    const { data } = await api.post('/auth/login', { email, password });
+  const login = async (identifier, password) => {
+    const { data } = await api.post('/auth/login', { identifier, password });
 
     localStorage.setItem('token', data.token);
     localStorage.setItem('user',  JSON.stringify(data.user));
@@ -28,6 +28,11 @@ export const AuthProvider = ({ children }) => {
     setUser(data.user);
 
     navigate('/dashboard');
+  };
+
+  const updateUser = (nextUser) => {
+    localStorage.setItem('user', JSON.stringify(nextUser));
+    setUser(nextUser);
   };
 
   // ── logout(): clear session and redirect ────────────────────────
@@ -40,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

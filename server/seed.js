@@ -4,11 +4,10 @@ const mongoose  = require('mongoose');
 const dotenv    = require('dotenv');
 const connectDB = require('./config/db');
 const User      = require('./models/user.model');
+const path      = require('path');
 
-// Load env explicitly
-dotenv.config({ path: '../.env' }); // or .env if at root, dotenv handles it mostly. Actually best to load process.env.MONGO_URI from standard root .env
-// We must ensure the correct path if run from root vs /server
-dotenv.config({ path: require('path').resolve(__dirname, '../.env') });
+// Load env from project root
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const seedAdmin = async () => {
   try {
@@ -22,6 +21,7 @@ const seedAdmin = async () => {
     // 3. Create Admin configuration per requirements
     const adminUser = new User({
       name: 'Admin',
+      username: 'admin',
       email: 'admin@system.com',
       password: 'Admin@123',
       role: 'admin',

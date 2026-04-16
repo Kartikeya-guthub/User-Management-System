@@ -14,7 +14,7 @@ const { ROLES } = require('../config/roles');
 router.post(
   '/login',
   [
-    body('email').isEmail().withMessage('Please provide a valid email').normalizeEmail(),
+    body('identifier').trim().notEmpty().withMessage('Email or username is required'),
     body('password').notEmpty().withMessage('Password is required'),
   ],
   login

@@ -1,39 +1,44 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const navStyle = {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '12px 32px', background: '#1a202c', color: '#fff',
-  };
-  const linkStyle = { color: '#cbd5e0', textDecoration: 'none', marginRight: 20 };
-
   return (
-    <nav style={navStyle}>
-      <div>
-        <Link to="/dashboard" style={{ ...linkStyle, fontWeight: 700, fontSize: 18, color: '#fff' }}>
+    <nav className="app-nav surface">
+      <div className="app-nav__brand">
+        <Link to="/dashboard" className="app-nav__logo">
           UMS
         </Link>
-        <Link to="/dashboard" style={linkStyle}>Dashboard</Link>
+        <div>
+          <div className="app-nav__title">User Management System</div>
+          <div className="app-nav__subtitle">RBAC dashboard for admin, manager and user roles</div>
+        </div>
+      </div>
 
-        {/* Admin + Manager only */}
+      <div className="app-nav__links">
+        <NavLink to="/dashboard" className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}>
+          Dashboard
+        </NavLink>
+
         {(user?.role === 'admin' || user?.role === 'manager') && (
-          <Link to="/users" style={linkStyle}>Users</Link>
+          <NavLink to="/users" className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}>
+            Users
+          </NavLink>
         )}
 
-        <Link to="/profile" style={linkStyle}>Profile</Link>
+        <NavLink to="/profile" className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}>
+          Profile
+        </NavLink>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <span style={{ color: '#a0aec0', fontSize: 14 }}>
-          {user?.name} ({user?.role})
-        </span>
-        <button
-          onClick={logout}
-          style={{ padding: '6px 14px', background: '#e53e3e', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
-        >
+
+      <div className="app-nav__profile">
+        <div className="app-nav__identity">
+          <span className="badge badge--neutral">{user?.role}</span>
+          <span className="app-nav__user">{user?.name}</span>
+        </div>
+        <button onClick={logout} className="btn btn--ghost btn--sm">
           Logout
         </button>
       </div>

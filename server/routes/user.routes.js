@@ -22,6 +22,7 @@ router.post(
   [
     body('name').trim().notEmpty().withMessage('Name is required'),
     body('email').isEmail().withMessage('Valid email is required').normalizeEmail(),
+    body('username').optional().trim().matches(/^[A-Za-z0-9._-]+$/).withMessage('Invalid username'),
     body('role').optional().isIn([ROLES.ADMIN, ROLES.MANAGER, ROLES.USER]).withMessage('Invalid role'),
     body('status').optional().isIn(['active', 'inactive']).withMessage('Invalid status'),
   ],
@@ -49,6 +50,13 @@ router.put(
   '/:id',
   verifyToken,
   authorizeRoles(ROLES.ADMIN, ROLES.MANAGER, ROLES.USER),
+  [
+    body('name').optional().trim().notEmpty().withMessage('Name cannot be empty'),
+    body('email').optional().isEmail().withMessage('Valid email is required').normalizeEmail(),
+    body('username').optional().trim().matches(/^[A-Za-z0-9._-]+$/).withMessage('Invalid username'),
+    body('role').optional().isIn([ROLES.ADMIN, ROLES.MANAGER, ROLES.USER]).withMessage('Invalid role'),
+    body('status').optional().isIn(['active', 'inactive']).withMessage('Invalid status'),
+  ],
   updateUser
 );
 

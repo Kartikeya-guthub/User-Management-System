@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './routes/ProtectedRoute';
 import RoleRoute from './routes/RoleRoute';
 import Navbar from './components/Navbar';
+import './App.css';
 import LoginPage       from './pages/LoginPage';
 import DashboardPage   from './pages/DashboardPage';
 import UsersPage       from './pages/UsersPage';
@@ -15,11 +16,14 @@ const App = () => {
   const { token } = useAuth();
 
   return (
-    <>
-      {/* Navbar shown only when logged in */}
+    <div className="app-shell">
+      <div className="app-shell__glow app-shell__glow--a" />
+      <div className="app-shell__glow app-shell__glow--b" />
+      <div className="app-shell__glow app-shell__glow--c" />
+
       {token && <Navbar />}
 
-      <div style={{ minHeight: '100vh', background: '#f7fafc' }}>
+      <main className="app-shell__main">
         <Routes>
           {/* Public */}
           <Route
@@ -78,8 +82,8 @@ const App = () => {
           {/* Default redirect */}
           <Route path="*" element={<Navigate to={token ? '/dashboard' : '/login'} replace />} />
         </Routes>
-      </div>
-    </>
+      </main>
+    </div>
   );
 };
 

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
 const ProfilePage = () => {
-  const { user, login } = useAuth();
+  const { user, updateUser } = useAuth();
   const { addToast } = useToast();
 
   const [name,     setName]     = useState(user?.name || '');
@@ -28,7 +28,8 @@ const ProfilePage = () => {
     try {
       const payload = { name };
       if (password) payload.password = password;
-      await api.put(`/users/${user._id}`, payload);
+      const { data } = await api.put(`/users/${user._id}`, payload);
+      updateUser(data.data);
       addToast('Profile updated successfully');
       setPassword('');
       setConfirm('');
@@ -39,55 +40,72 @@ const ProfilePage = () => {
     }
   };
 
-  const inputStyle = { width: '100%', padding: '9px 12px', borderRadius: 6, border: '1px solid #cbd5e0', boxSizing: 'border-box' };
-  const labelStyle = { display: 'block', marginBottom: 6, fontWeight: 600, color: '#4a5568' };
-
   return (
-    <div style={{ padding: 32, maxWidth: 480 }}>
-      <h2>My Profile</h2>
-      <div style={{ background: '#fff', padding: 24, borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.1)', marginBottom: 24 }}>
-        <p><strong>Email:</strong> {user?.email}</p>
-        <p><strong>Role:</strong> <span style={{ textTransform: 'capitalize' }}>{user?.role}</span></p>
-        <p><strong>Status:</strong> {user?.status}</p>
-      </div>
+    <div className="page page--narrow">
+      <section className="surface page-header page-header--stacked">
+        <div>
+          <span className="eyebrow">Self service</span>
+          <h1>My profile</h1>
+          <p>Update your name or change your password securely.</p>
+        </div>
+        <span className="badge badge--info">{user?.role}</span>
+      </section>
 
-      <form onSubmit={handleSubmit} style={{ background: '#fff', padding: 24, borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.1)' }}>
-        <h3 style={{ marginTop: 0 }}>Update Profile</h3>
+      <section className="surface profile-summary">
+        <div>
+          <p className="profile-summary__label">Email</p>
+          <p className="profile-summary__value">{user?.email}</p>
+        </div>
+        <div>
+          <p className="profile-summary__label">Username</p>
+          <p className="profile-summary__value">{user?.username || 'Not set'}</p>
+        </div>
+        <div>
+          <p className="profile-summary__label">Role</p>
+          <p className="profile-summary__value">{user?.role}</p>
+        </div>
+        <div>
+          <p className="profile-summary__label">Status</p>
+          <p className="profile-summary__value">{user?.status}</p>
+        </div>
+      </section>
 
-        <div style={{ marginBottom: 16 }}>
-          <label style={labelStyle}>Name</label>
-          <input
-            style={{ ...inputStyle, borderColor: nameError ? '#e53e3e' : '#cbd5e0' }}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={() => setTouched((t) => ({ ...t, name: true }))}
-          />
-          {nameError && <p style={{ margin: '4px 0 0', color: '#e53e3e', fontSize: 13 }}>{nameError}</p>}
+      <form onSubmit={handleSubmit} className="surface form-card">
+        <div className="form-grid">
+          <label className="field">
+            <span>Name</span>
+            <input
+              className={nameError ? 'input input--error' : 'input'}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={() => setTouched((t) => ({ ...t, name: true }))}
+            />
+            {nameError && <p className="field-error">{nameError}</p>}
+          </label>
+
+          <label className="field">
+            <span>New Password <em>(leave blank to keep current)</em></span>
+            <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          </label>
+
+          <label className="field">
+            <span>Confirm New Password</span>
+            <input
+              className={confirmError ? 'input input--error' : 'input'}
+              type="password"
+              value={confirm}
+              onChange={(e) => { setConfirm(e.target.value); setTouched((t) => ({ ...t, confirm: true })); }}
+              onBlur={() => setTouched((t) => ({ ...t, confirm: true }))}
+            />
+            {confirmError && <p className="field-error">{confirmError}</p>}
+          </label>
         </div>
 
-        <div style={{ marginBottom: 16 }}>
-          <label style={labelStyle}>New Password <span style={{ fontWeight: 400, color: '#718096' }}>(leave blank to keep current)</span></label>
-          <input style={inputStyle} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <div className="form-actions">
+          <button type="submit" disabled={saving || hasErrors} className="btn btn--primary">
+            {saving ? 'Saving...' : 'Update Profile'}
+          </button>
         </div>
-
-        <div style={{ marginBottom: 20 }}>
-          <label style={labelStyle}>Confirm New Password</label>
-          <input
-            style={{ ...inputStyle, borderColor: confirmError ? '#e53e3e' : '#cbd5e0' }}
-            type="password"
-            value={confirm}
-            onChange={(e) => { setConfirm(e.target.value); setTouched((t) => ({ ...t, confirm: true })); }}
-            onBlur={() => setTouched((t) => ({ ...t, confirm: true }))}
-          />
-          {confirmError && <p style={{ margin: '4px 0 0', color: '#e53e3e', fontSize: 13 }}>{confirmError}</p>}
-        </div>
-
-        {/* Role and status intentionally NOT shown — user cannot change them */}
-
-        <button type="submit" disabled={saving || hasErrors}
-          style={{ width: '100%', padding: '10px', background: (saving || hasErrors) ? '#a0aec0' : '#3182ce', color: '#fff', border: 'none', borderRadius: 6, cursor: (saving || hasErrors) ? 'not-allowed' : 'pointer' }}>
-          {saving ? 'Saving...' : 'Update Profile'}
-        </button>
       </form>
     </div>
   );

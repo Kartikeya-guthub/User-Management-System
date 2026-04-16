@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const { login } = useAuth();
-  const [email,    setEmail]    = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
@@ -13,7 +13,7 @@ const LoginPage = () => {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      await login(identifier, password);
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -22,35 +22,75 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '100px auto', padding: 24, border: '1px solid #ddd', borderRadius: 8 }}>
-      <h2>User Management System</h2>
-      <h3>Login</h3>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 12 }}>
-          <label>Email</label><br />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: '100%', padding: 8 }}
-          />
+    <div className="auth-layout">
+      <section className="auth-hero surface">
+        <span className="eyebrow">MERN Stack Assessment</span>
+        <h1>Secure user management with role-based access control.</h1>
+        <p>
+          Log in to manage users, view audit information, and switch between admin, manager,
+          and regular user capabilities in a clean, responsive interface.
+        </p>
+
+        <div className="feature-list">
+          <div className="feature-item">
+            <strong>Authentication</strong>
+            <span>JWT session handling with persisted login state.</span>
+          </div>
+          <div className="feature-item">
+            <strong>Authorization</strong>
+            <span>Protected pages and UI actions based on role.</span>
+          </div>
+          <div className="feature-item">
+            <strong>Audit trail</strong>
+            <span>Created and updated metadata on user records.</span>
+          </div>
         </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Password</label><br />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: '100%', padding: 8 }}
-          />
+      </section>
+
+      <section className="auth-card surface">
+        <div className="auth-card__header">
+          <span className="badge badge--info">Sign in</span>
+          <h2>Welcome back</h2>
+          <p>Use your email or username and password to access the workspace.</p>
         </div>
-        <button type="submit" disabled={loading} style={{ width: '100%', padding: 10 }}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+
+        {error && <div className="alert alert--danger">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="form">
+          <label className="field">
+            <span>Email or username</span>
+            <input
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              required
+              autoComplete="username"
+              placeholder="admin or admin@system.com"
+            />
+          </label>
+
+          <label className="field">
+            <span>Password</span>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              placeholder="Enter your password"
+            />
+          </label>
+
+          <button type="submit" disabled={loading} className="btn btn--primary btn--block">
+            {loading ? 'Signing in...' : 'Login'}
+          </button>
+        </form>
+
+        <div className="login-note">
+          <span className="badge badge--neutral">Tip</span>
+          <p>Use the seeded admin account from the README to demonstrate full RBAC flows.</p>
+        </div>
+      </section>
     </div>
   );
 };

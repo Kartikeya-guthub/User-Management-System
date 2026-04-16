@@ -14,11 +14,18 @@ const login = async (req, res, next) => {
     return res.status(400).json({ success: false, errors: errors.array() });
   }
 
-  const { email, password } = req.body;
+  const { identifier, email, password } = req.body;
 
   try {
+    const loginValue = String(identifier || email || '').trim().toLowerCase();
+
     // 2. Find user (Must explicitly select +password since it's hidden by default in schema)
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({
+      $or: [
+        { email: loginValue },
+        { username: loginValue },
+      ],
+    }).select('+password');
 
     // 3. User exists check
     if (!user) {

@@ -8,6 +8,28 @@ const { ROLES } = require('../config/roles');
 // ── Helper: generate random password ─────────────────────────────
 const generatePassword = () => Math.random().toString(36).slice(-8) + 'A1!';
 
+// ── Helper: generate / normalize username ────────────────────────
+const normalizeUsername = (value) => String(value || '')
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9._-]/g, '');
+
+const buildUniqueUsername = async (baseValue, excludeId = null) => {
+  const cleanBase = normalizeUsername(baseValue) || 'user';
+  let candidate = cleanBase;
+  let suffix = 1;
+
+  while (await User.findOne({
+    username: candidate,
+    ...(excludeId ? { _id: { $ne: excludeId } } : {}),
+  })) {
+    candidate = `${cleanBase}${suffix}`;
+    suffix += 1;
+  }
+
+  return candidate;
+};
+
 // ── Helper: escape special regex characters to prevent ReDoS ─────
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -18,17 +40,25 @@ const createUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
 
-  const { name, email, role, status, password } = req.body;
+  const { name, email, username, role, status, password } = req.body;
 
   try {
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ success: false, message: 'Email already in use' });
+
+    const usernameValue = username
+      ? normalizeUsername(username)
+      : await buildUniqueUsername(email.split('@')[0]);
+
+    const usernameTaken = await User.findOne({ username: usernameValue });
+    if (usernameTaken) return res.status(400).json({ success: false, message: 'Username already in use' });
 
     const rawPassword = password || generatePassword();
 
     const user = await User.create({
       name,
       email,
+      username: usernameValue,
       password: rawPassword,
       role: role || ROLES.USER,
       status: status || 'active',
@@ -60,11 +90,11 @@ const getUsers = async (req, res) => {
     if (req.query.role)   filter.role   = req.query.role;
     if (req.query.status) filter.status = req.query.status;
 
-    // Partial search on name OR email — escape input to prevent ReDoS
+    // Partial search on name, username, or email — escape input to prevent ReDoS
     if (req.query.search) {
       const safe  = escapeRegex(req.query.search);
       const regex = new RegExp(safe, 'i');
-      filter.$or = [{ name: regex }, { email: regex }];
+      filter.$or = [{ name: regex }, { username: regex }, { email: regex }];
     }
 
     const [users, total] = await Promise.all([
@@ -132,10 +162,19 @@ const updateUser = async (req, res) => {
 
     if (requester.role === ROLES.ADMIN) {
       // Admin can change any field
-      const { name, email, role, status } = req.body;
+      const { name, email, username, role, status } = req.body;
       if (name)   updates.name   = name;
       if (role)   updates.role   = role;
       if (status) updates.status = status;
+
+      if (username) {
+        const normalized = normalizeUsername(username);
+        const taken = await User.findOne({ username: normalized, _id: { $ne: target._id } });
+        if (taken) return res.status(400).json({ success: false, message: 'Username already in use' });
+        updates.username = normalized;
+      } else if (!target.username) {
+        updates.username = await buildUniqueUsername(target.email.split('@')[0], target._id);
+      }
 
       // Email update: check uniqueness to prevent collision
       if (email && email !== target.email) {
@@ -153,10 +192,19 @@ const updateUser = async (req, res) => {
       if (req.body.role === ROLES.ADMIN) {
         return res.status(403).json({ success: false, message: 'Not authorized to assign admin role' });
       }
-      const { name, email, role, status } = req.body;
+      const { name, email, username, role, status } = req.body;
       if (name)   updates.name   = name;
       if (role)   updates.role   = role;
       if (status) updates.status = status;
+
+      if (username) {
+        const normalized = normalizeUsername(username);
+        const taken = await User.findOne({ username: normalized, _id: { $ne: target._id } });
+        if (taken) return res.status(400).json({ success: false, message: 'Username already in use' });
+        updates.username = normalized;
+      } else if (!target.username) {
+        updates.username = await buildUniqueUsername(target.email.split('@')[0], target._id);
+      }
 
       // Email update: check uniqueness to prevent collision
       if (email && email !== target.email) {

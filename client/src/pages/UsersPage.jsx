@@ -21,6 +21,8 @@ const UsersPage = () => {
   const [total,   setTotal]   = useState(0);
 
   const [deactivateModal, setDeactivateModal] = useState(null);
+  const isAdmin = user?.role === 'admin';
+  const isManager = user?.role === 'manager';
 
   // Search Debounce (500ms)
   useEffect(() => {
@@ -69,58 +71,61 @@ const UsersPage = () => {
   const td = { padding: '10px 14px', borderBottom: '1px solid #e2e8f0', color: '#2d3748' };
 
   return (
-    <div style={{ padding: 32 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2 style={{ margin: 0 }}>User Management</h2>
-        {/* Create User — Admin only */}
-        {user?.role === 'admin' && (
-          <button
-            onClick={() => navigate('/users/create')}
-            style={{ padding: '8px 18px', background: '#3182ce', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer' }}
-          >
+    <div className="page">
+      <section className="surface page-header">
+        <div>
+          <span className="eyebrow">Administration</span>
+          <h1>User management</h1>
+          <p>
+            Browse, filter, and maintain user accounts. {isAdmin ? 'As an admin you can also create and deactivate accounts.' : 'As a manager you can review and update non-admin users.'}
+          </p>
+        </div>
+
+        {isAdmin && (
+          <button onClick={() => navigate('/users/create')} className="btn btn--primary">
             + Create User
           </button>
         )}
-      </div>
+      </section>
 
-      {/* Filters */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+      <section className="surface toolbar">
         <input
-          placeholder="Search name or email..."
+          placeholder="Search name, username, or email..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #cbd5e0', minWidth: 220 }}
+          className="input search-input"
         />
-        <select value={role} onChange={(e) => setRole(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #cbd5e0' }}>
+        <select value={role} onChange={(e) => setRole(e.target.value)} className="input select-input">
           <option value="">All Roles</option>
           <option value="admin">Admin</option>
           <option value="manager">Manager</option>
           <option value="user">User</option>
         </select>
-        <select value={status} onChange={(e) => setStatus(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #cbd5e0' }}>
+        <select value={status} onChange={(e) => setStatus(e.target.value)} className="input select-input">
           <option value="">All Statuses</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
-        <button onClick={() => { setSearchInput(''); setSearch(''); setRole(''); setStatus(''); setPage(1); }}
-          style={{ padding: '8px 14px', background: '#718096', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer' }}>
+        <button onClick={() => { setSearchInput(''); setSearch(''); setRole(''); setStatus(''); setPage(1); }} className="btn btn--secondary">
           Clear
         </button>
-      </div>
-
-      {/* Table & Error Boundary */}
-      {error ? (
-        <div style={{ background: '#fff5f5', color: '#c53030', padding: 24, borderRadius: 8, border: '1px solid #fed7d7' }}>
-          <strong>Error: </strong> {error}
+        <div className="toolbar__meta">
+          <span className="badge badge--neutral">{total} records</span>
+          <span className="badge badge--info">Page {page} of {pages}</span>
         </div>
+      </section>
+
+      {error ? (
+        <div className="alert alert--danger">{error}</div>
       ) : loading ? (
-        <div style={{ padding: 40, textAlign: 'center', color: '#718096' }}>Loading users...</div>
+        <div className="surface empty-state">Loading users...</div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', borderRadius: 8, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.1)' }}>
+        <div className="surface table-shell">
+          <table className="table">
             <thead>
               <tr>
                 <th style={th}>Name</th>
+                <th style={th}>Username</th>
                 <th style={th}>Email</th>
                 <th style={th}>Role</th>
                 <th style={th}>Status</th>
@@ -131,38 +136,32 @@ const UsersPage = () => {
             <tbody>
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ ...td, textAlign: 'center', padding: '40px 10px', color: '#718096' }}>
-                    <div style={{ fontSize: 18, marginBottom: 8 }}>No users found</div>
-                    <div style={{ fontSize: 14 }}>Try adjusting your search or filters.</div>
+                  <td colSpan={7} className="empty-cell">
+                    <div className="empty-state__title">No users found</div>
+                    <div className="empty-state__text">Try adjusting your search or filters.</div>
                   </td>
                 </tr>
               ) : users.map((u) => (
                 <tr key={u._id}>
                   <td style={td}>{u.name}</td>
+                  <td style={td}>{u.username || '—'}</td>
                   <td style={td}>{u.email}</td>
-                  <td style={td}><span style={{ textTransform: 'capitalize' }}>{u.role}</span></td>
+                  <td style={td}><span className={`badge badge--role badge--role-${u.role}`}>{u.role}</span></td>
                   <td style={td}>
-                    <span style={{ color: u.status === 'active' ? '#38a169' : '#e53e3e', fontWeight: 600 }}>
-                      {u.status}
-                    </span>
+                    <span className={`badge ${u.status === 'active' ? 'badge--success' : 'badge--warning'}`}>{u.status}</span>
                   </td>
                   <td style={td}>{new Date(u.createdAt).toLocaleDateString()}</td>
                   <td style={td}>
-                    <button onClick={() => navigate(`/users/${u._id}`)}
-                      style={{ marginRight: 6, padding: '4px 10px', borderRadius: 4, border: '1px solid #3182ce', background: '#ebf8ff', color: '#3182ce', cursor: 'pointer' }}>
+                    <button onClick={() => navigate(`/users/${u._id}`)} className="btn btn--chip btn--info">
                       View
                     </button>
-                    {/* Edit: hide for user role when viewing admin */}
-                    {!(user?.role === 'manager' && u.role === 'admin') && (
-                      <button onClick={() => navigate(`/users/${u._id}/edit`)}
-                        style={{ marginRight: 6, padding: '4px 10px', borderRadius: 4, border: '1px solid #d69e2e', background: '#fffff0', color: '#d69e2e', cursor: 'pointer' }}>
+                    {!(isManager && u.role === 'admin') && (
+                      <button onClick={() => navigate(`/users/${u._id}/edit`)} className="btn btn--chip btn--warning">
                         Edit
                       </button>
                     )}
-                    {/* Deactivate: Admin only, only active users, not self */}
-                    {user?.role === 'admin' && u.status === 'active' && u._id !== user?._id && (
-                      <button onClick={() => setDeactivateModal(u._id)}
-                        style={{ padding: '4px 10px', borderRadius: 4, border: '1px solid #e53e3e', background: '#fff5f5', color: '#e53e3e', cursor: 'pointer' }}>
+                    {isAdmin && u.status === 'active' && u._id !== user?._id && (
+                      <button onClick={() => setDeactivateModal(u._id)} className="btn btn--chip btn--danger">
                         Deactivate
                       </button>
                     )}
@@ -174,25 +173,16 @@ const UsersPage = () => {
         </div>
       )}
 
-      {/* Pagination */}
       {!error && total > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 20, flexWrap: 'wrap' }}>
-          {/* Prev */}
+        <div className="pagination surface">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1 || loading}
-            style={{
-              padding: '6px 14px', borderRadius: 4, border: '1px solid #cbd5e0',
-              cursor: page === 1 ? 'not-allowed' : 'pointer',
-              background: '#fff', color: '#4a5568',
-              opacity: page === 1 ? 0.4 : 1,
-              fontWeight: 500,
-            }}
+            className="btn btn--secondary btn--sm"
           >
             ← Prev
           </button>
 
-          {/* Numbered page buttons — window of up to 5 pages around current */}
           {(() => {
             const pageButtons = [];
             const delta = 2;
@@ -202,24 +192,18 @@ const UsersPage = () => {
             if (start > 1) {
               pageButtons.push(
                 <button key={1} onClick={() => setPage(1)}
-                  style={{ padding: '6px 11px', borderRadius: 4, border: '1px solid #cbd5e0', cursor: 'pointer', background: '#fff', color: '#4a5568' }}>
+                  className="btn btn--ghost btn--sm">
                   1
                 </button>
               );
-              if (start > 2) pageButtons.push(<span key="ellipsis-start" style={{ padding: '6px 4px', color: '#a0aec0' }}>…</span>);
+              if (start > 2) pageButtons.push(<span key="ellipsis-start" className="pagination__ellipsis">…</span>);
             }
 
             for (let i = start; i <= end; i++) {
               const isActive = i === page;
               pageButtons.push(
                 <button key={i} onClick={() => setPage(i)}
-                  style={{
-                    padding: '6px 11px', borderRadius: 4, cursor: isActive ? 'default' : 'pointer',
-                    border: isActive ? '2px solid #3182ce' : '1px solid #cbd5e0',
-                    background: isActive ? '#3182ce' : '#fff',
-                    color: isActive ? '#fff' : '#4a5568',
-                    fontWeight: isActive ? 700 : 400,
-                  }}
+                  className={`btn btn--sm ${isActive ? 'btn--primary' : 'btn--ghost'}`}
                   disabled={isActive}
                 >
                   {i}
@@ -228,10 +212,10 @@ const UsersPage = () => {
             }
 
             if (end < pages) {
-              if (end < pages - 1) pageButtons.push(<span key="ellipsis-end" style={{ padding: '6px 4px', color: '#a0aec0' }}>…</span>);
+              if (end < pages - 1) pageButtons.push(<span key="ellipsis-end" className="pagination__ellipsis">…</span>);
               pageButtons.push(
                 <button key={pages} onClick={() => setPage(pages)}
-                  style={{ padding: '6px 11px', borderRadius: 4, border: '1px solid #cbd5e0', cursor: 'pointer', background: '#fff', color: '#4a5568' }}>
+                  className="btn btn--ghost btn--sm">
                   {pages}
                 </button>
               );
@@ -240,40 +224,30 @@ const UsersPage = () => {
             return pageButtons;
           })()}
 
-          {/* Next */}
           <button
             onClick={() => setPage((p) => Math.min(pages, p + 1))}
             disabled={page === pages || loading}
-            style={{
-              padding: '6px 14px', borderRadius: 4, border: '1px solid #cbd5e0',
-              cursor: page === pages ? 'not-allowed' : 'pointer',
-              background: '#fff', color: '#4a5568',
-              opacity: page === pages ? 0.4 : 1,
-              fontWeight: 500,
-            }}
+            className="btn btn--secondary btn--sm"
           >
             Next →
           </button>
 
-          <span style={{ color: '#718096', fontSize: 13, marginLeft: 6 }}>
+          <span className="pagination__summary">
             {total} total record{total !== 1 ? 's' : ''}
           </span>
         </div>
       )}
 
-      {/* Deactivation Confirmation Modal */}
       {deactivateModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}>
-          <div style={{ background: '#fff', padding: 24, borderRadius: 8, width: 320, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
-            <h3 style={{ marginTop: 0, color: '#e53e3e' }}>Confirm Deactivation</h3>
-            <p style={{ color: '#4a5568' }}>Are you sure you want to deactivate this user? They will no longer be able to log in.</p>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24 }}>
-              <button onClick={() => setDeactivateModal(null)}
-                style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: '#edf2f7', cursor: 'pointer' }}>
+        <div className="modal-backdrop">
+          <div className="modal surface">
+            <h3>Confirm deactivation</h3>
+            <p>This user will be set inactive and can no longer log in until reactivated.</p>
+            <div className="modal__actions">
+              <button onClick={() => setDeactivateModal(null)} className="btn btn--secondary">
                 Cancel
               </button>
-              <button onClick={handleDeactivate}
-                style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: '#e53e3e', color: '#fff', cursor: 'pointer' }}>
+              <button onClick={handleDeactivate} className="btn btn--danger">
                 Deactivate User
               </button>
             </div>
