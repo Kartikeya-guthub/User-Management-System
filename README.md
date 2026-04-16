@@ -4,7 +4,7 @@
 
 **Deployed App:** https://user-management-system-do8b.onrender.com  
 **API Docs:** https://user-management-system-do8b.onrender.com/api-docs  
-**Source Code:** https://github.com/your-username/user-management-system
+**Source Code:** https://github.com/Kartikeya-guthub/User-Management-System
 
 ---
 
@@ -90,7 +90,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/your-username/user-management-system.git
+git clone https://github.com/Kartikeya-guthub/User-Management-System.git
 cd user-management-system
 
 # Install backend dependencies
