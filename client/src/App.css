@@ -588,6 +588,18 @@
   font-weight: 700;
 }
 
+.action-card__badge {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.action-card__badge .badge {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+}
+
 .auth-layout {
   gap: 20px;
   align-items: stretch;
